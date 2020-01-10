@@ -1,0 +1,410 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+	<title>Renault 100% electrique- Table of Contents</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.5.1.288">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/silver-theme/jquery-ui-1.8.12.custom.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/dynatree/chm/ui.dynatree.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+    <link type="text/css" rel="stylesheet" media="all" href="css/toc.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#tabs .ui-widget-header
+		{
+			background-color: #C0C0C0;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/jquery.dynatree.min.js"></script>
+	<script type="text/javascript" src="js/hndjsse.js"></script>
+	<script type="text/javascript">
+	
+		var bSearchDataLoaded = false;
+		var sHelpIdToActivate = '';
+	
+		$(document).ready(function()
+		{
+			var sAnchorName = top.location.href.substring(top.location.href.lastIndexOf("#") + 1, top.location.href.length);
+			var nSelectedTab = 0;
+			if (sAnchorName == '_index') nSelectedTab = 1
+			else if (sAnchorName == '_search') nSelectedTab = 2;			
+			$("#tabs").tabs({
+				selected: nSelectedTab,
+				select: function(event, ui) { HideKwPopup(); }
+			});
+			
+			// Toc
+			$("#tab-toc").dynatree({
+				clickFolderMode: 1,
+				debugLevel: 0,
+				imagePath: 'css/dynatree/chm/',
+				onActivate: function(node){
+					if ($("#tab-keywords") && $("#tab-keywords").dynatree && $("#tab-keywords").dynatree("getTree") && $("#tab-keywords").dynatree("getTree").activateKey)
+						$("#tab-keywords").dynatree("getTree").activateKey(null);
+					if(node.data.href && node.data.href != '#'){
+						window.open(node.data.href, node.data.target);
+					}
+				}
+			});
+			// Expand all nodes if required
+			$("#tab-toc").dynatree("getRoot").visit(function(node){
+					node.expand(true);
+				});
+			// Select the active help id
+			if (sHelpIdToActivate != '') $("#tab-toc").dynatree("getTree").activateKey(sHelpIdToActivate);
+			
+			// Keywords
+			$("#tab-keywords").dynatree({
+				clickFolderMode: 1,
+				debugLevel: 0,
+				imagePath: 'css/dynatree/chm/',
+				onClick: function(node, event){
+					HideKwPopup();
+					if (node.data && node.data.click)
+					{
+						var aRefList = null;
+						eval('aRefList=' + node.data.click);
+						if (ShowKwPopup(node.li, aRefList))
+						{
+							if ($("#tab-toc") && $("#tab-toc").dynatree && $("#tab-toc").dynatree("getTree") && $("#tab-toc").dynatree("getTree").activateKey)
+								$("#tab-toc").dynatree("getTree").activateKey(null);
+							if(node.data.href && node.data.href != '#'){
+								window.open(node.data.href, node.data.target);
+							}
+						}
+					}
+				}
+			});
+			// Expand all nodes if required
+			$("#tab-keywords").dynatree("getRoot").visit(function(node){
+					node.expand(true);
+				});
+			// Load search data
+			$.getScript("js/searchdata.js",	function() {
+				bSearchDataLoaded = true;
+			});
+		});
+		
+		$('body').click(function() {
+			HideKwPopup();
+		});
+		
+		function SelectTocItem(sHelpId)
+		{
+			if ($("#tab-toc") && $("#tab-toc").dynatree && $("#tab-toc").dynatree("getTree") && $("#tab-toc").dynatree("getTree").getNodeByKey) {
+				$("#tab-toc").dynatree("getTree").getNodeByKey(sHelpId).activateSilently();
+			}
+			else {
+				sHelpIdToActivate = sHelpId;
+			}
+		}
+		
+		function HideKwPopup()
+		{
+			if($("#popupMenu")) $("#popupMenu").remove();
+		}
+		
+		function ShowKwPopup(oSender, aLinks)
+		{
+			HideKwPopup();
+			if (!aLinks || !aLinks.length || aLinks.length == 0) return false
+			else if (aLinks.length == 1) return true
+			else
+			{
+				var oParentDiv = document.createElement("DIV");
+				oParentDiv.id = "popupMenu";
+				var oLink = null;
+				// Close button
+				oLink = document.createElement("SPAN");
+				oLink.className = "close-button";
+				oLink.innerHTML = "X";
+				oLink.href = "#";
+				oLink.onclick = HideKwPopup;
+				oParentDiv.appendChild(oLink);
+				// Items
+				for (var nCnt=0; nCnt<aLinks.length; nCnt++)
+				{
+					oLink = document.createElement("A");
+					oLink.innerHTML = aLinks[nCnt][0];
+					oLink.href = aLinks[nCnt][1];
+					oLink.target = "FrameMain";
+					oLink.onclick = HideKwPopup;
+					oParentDiv.appendChild(oLink);
+				}
+				document.body.appendChild(oParentDiv);
+				var pos = $(oSender).offset(); 
+				var height = $(oSender).height();
+				$(oParentDiv).css({
+					"left": (pos.left+20) + "px",
+					"top": (pos.top + height + 5) + "px"
+				});
+				$(oParentDiv).show();
+				return false;
+			}
+		}
+		
+		function PerformSearch()
+		{
+			sValue = $("#search_value").val();
+			$("#search_results").html('Searching...');
+			var oSearchEngine = new HndJsSe;
+			oSearchEngine.ParseInput(sValue);			
+			oSearchEngine.PerformSearch();
+			if (!oSearchEngine.aResults || !oSearchEngine.aResults.length)
+			{
+				$("#search_results").html('No results found.');
+			}
+			else
+			{
+				$("#search_results").html('<div id="search_results_content"></div>');
+				var oUl = $("#search_results_content").append("<ul id='lr'></ul>").find("ul");
+				for (var nCnt = 0; nCnt < oSearchEngine.aResults.length; nCnt++)
+				{
+					oUl.append("<li><a href='" + aTl[oSearchEngine.aResults[nCnt]][0] + "?search=" + escape(sValue) + "' target='FrameMain'>" + unescape(aTl[oSearchEngine.aResults[nCnt]][1]) + "</a></li>");
+				}
+				// Tree
+				$("#search_results_content").dynatree({
+					clickFolderMode: 1,
+					debugLevel: 0,
+					imagePath: 'css/dynatree/chm/',
+					onActivate: function(node){
+						if ($("#search_results_content") && $("#search_results_content").dynatree && $("#search_results_content").dynatree("getTree") && $("#search_results_content").dynatree("getTree").activateKey)
+							$("#search_results_content").dynatree("getTree").activateKey(null);
+						if(node.data.href && node.data.href != '#'){
+							window.open(node.data.href, node.data.target);
+						}
+					}
+				});
+			}
+		}
+	</script>
+</head>
+
+<body>
+
+	<div id="tabs">
+		<ul>
+			<li><a href="#tab-toc">Sommaire</a></li>
+			<li><a href="#tab-search">Recherche</a></li>
+			</ul>
+		<div id="tab-toc">
+			<ul id="toc" class="">
+
+				<li class="folder" id="Prsentation" data="">
+							<a
+							href="Prsentation.html"
+							target="FrameMain">
+								Pr&eacute;sentation</a>
+
+				<ul><li class="folder" id="LecasRenault100lectrique" data="">
+							<a
+							href="#" onclick="return false;"
+							target="FrameMain">
+								Le cas Renault 100% &eacute;lectrique</a>
+
+				<ul><li class="" id="Lagamme" data="">
+							<a
+							href="Lagamme.html"
+							target="FrameMain">
+								La gamme</a>
+
+				</li><li class="" id="Unevoitureauquotidien" data="">
+							<a
+							href="Unevoitureauquotidien.html"
+							target="FrameMain">
+								Une voiture au quotidien</a>
+
+				</li><li class="" id="Laconsommationnergetiquevueparle" data="">
+							<a
+							href="Laconsommationnergetiquevueparle.html"
+							target="FrameMain">
+								La consommation &eacute;nergetique vue par les consommateurs</a>
+
+				</li><li class="" id="Convergencebatimenttransport" data="">
+							<a
+							href="Convergencebatimenttransport.html"
+							target="FrameMain">
+								Convergence batiment transport</a>
+
+				</li><li class="" id="Bilanwelltowheel" data="">
+							<a
+							href="Bilanwelltowheel.html"
+							target="FrameMain">
+								Bilan well to wheel</a>
+
+				</li><li class="" id="EmissiondeCO2dupuitlaroue" data="">
+							<a
+							href="EmissiondeCO2dupuitlaroue.html"
+							target="FrameMain">
+								Emission de CO2 &quot;du puit &agrave; la roue&quot;</a>
+
+				</li></ul></li><li class="folder" id="Pourquoimaintenant" data="">
+							<a
+							href="#" onclick="return false;"
+							target="FrameMain">
+								Pourquoi maintenant?</a>
+
+				<ul><li class="" id="Unerupturetechnologique" data="">
+							<a
+							href="Unerupturetechnologique.html"
+							target="FrameMain">
+								Une rupture technologique</a>
+
+				</li><li class="" id="Unchoixrationnelpourleclient" data="">
+							<a
+							href="Unchoixrationnelpourleclient.html"
+							target="FrameMain">
+								Un choix rationnel pour le client</a>
+
+				</li><li class="" id="Uneurbanisationcroissante" data="">
+							<a
+							href="Uneurbanisationcroissante.html"
+							target="FrameMain">
+								Une urbanisation croissante</a>
+
+				</li></ul></li><li class="folder" id="Comment" data="">
+							<a
+							href="#" onclick="return false;"
+							target="FrameMain">
+								Comment?</a>
+
+				<ul><li class="" id="Ambition" data="">
+							<a
+							href="Ambition.html"
+							target="FrameMain">
+								Ambition</a>
+
+				</li><li class="" id="Stratgie" data="">
+							<a
+							href="Stratgie.html"
+							target="FrameMain">
+								Strat&eacute;gie</a>
+
+				</li><li class="" id="Innovation" data="">
+							<a
+							href="Innovation.html"
+							target="FrameMain">
+								Innovation</a>
+
+				</li><li class="" id="Problme" data="">
+							<a
+							href="Problme.html"
+							target="FrameMain">
+								Probl&egrave;me</a>
+
+				</li><li class="" id="Linfrastructurederecharge" data="">
+							<a
+							href="Linfrastructurederecharge.html"
+							target="FrameMain">
+								L'infrastructure de recharge</a>
+
+				</li><li class="" id="Unevisionpourdemain" data="">
+							<a
+							href="Unevisionpourdemain.html"
+							target="FrameMain">
+								Une vision pour demain</a>
+
+				</li></ul></li></ul></li><li class="folder" id="Activitslves" data="">
+							<a
+							href="#" onclick="return false;"
+							target="FrameMain">
+								Activit&eacute;s &eacute;l&egrave;ves</a>
+
+				<ul><li class="" id="Importanceduservicerenduetcompet" data="">
+							<a
+							href="Importanceduservicerenduetcompet.html"
+							target="FrameMain">
+								Importance du service rendu et competitivit&eacute;</a>
+
+				</li><li class="" id="Innovations" data="">
+							<a
+							href="Innovations.html"
+							target="FrameMain">
+								Innovations</a>
+
+				</li><li class="" id="Protectionsdesinnovationstechniq" data="">
+							<a
+							href="Protectionsdesinnovationstechniq.html"
+							target="FrameMain">
+								Protections des innovations techniques</a>
+
+				</li><li class="" id="Protectiondudessinetmodle" data="">
+							<a
+							href="Protectiondudessinetmodle.html"
+							target="FrameMain">
+								Protection du dessin et mod&egrave;le</a>
+
+				</li><li class="" id="Protectiondelamarque" data="">
+							<a
+							href="Protectiondelamarque.html"
+							target="FrameMain">
+								Protection de la marque</a>
+
+				</li></ul></li><li class="" id="Pourallerplusloin" data="">
+							<a
+							href="Pourallerplusloin.html"
+							target="FrameMain">
+								Pour aller plus loin</a>
+
+				</li><li class="" id="Documentsrponses" data="">
+							<a
+							href="Documentsrponses.html"
+							target="FrameMain">
+								Documents r&eacute;ponses</a>
+
+				</li><li class="" id="Documentsdesynthse" data="">
+							<a
+							href="Documentsdesynthse.html"
+							target="FrameMain">
+								Documents de synth&egrave;se</a>
+
+				</li><li class="folder" id="Ressourcescomplmentaires" data="">
+							<a
+							href="Ressourcescomplmentaires.html"
+							target="FrameMain">
+								Ressources compl&eacute;mentaires</a>
+
+				<ul><li class="" id="Dfinitiondelinnovation" data="">
+							<a
+							href="Dfinitiondelinnovation.html"
+							target="FrameMain">
+								D&eacute;finition de l'innovation</a>
+
+				</li></ul></li><li class="" id="Sources" data="">
+							<a
+							href="Sources.html"
+							target="FrameMain">
+								Sources</a>
+
+				</li><li class="" id="Rfrencesauprogramme" data="">
+							<a
+							href="Rfrencesauprogramme.html"
+							target="FrameMain">
+								R&eacute;f&eacute;rences au programme</a>
+
+				</li></ul>
+		</div>
+		
+		<div id="tab-search">
+			<form onsubmit="PerformSearch(); return false;">
+				<label for="search_value">Recherche:</label>
+				<input id="search_value" name="search_value"></input>
+				<input type="submit" value="Recherche"/>
+			</form>
+			<div id="search_results"></div>
+		</div>
+		
+		</div>
+    
+</body>
+
+</html>
+
